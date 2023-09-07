@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./profile.css">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1>POST YOUR BLOGS HERE</h1>
+        <div class="text">
+            <h1 class="name"></h1>
+            <h2 id="logout">Login</h2>
+        </div>
+        <div class="list">
+            <div class="div">:</div>
+            <div class="listItem">
+                <li><a href="./profile.html">Profile</a></li>
+                <li><a href="./index.html">Blogs</a></li>
+            </div>
+        </div>
+    </header>
+    <main>
+    <div class="userData">
+        <div class="img">
+            <img src="" alt="">
+        </div>
+        <h1 id="name"></h1>
+        <h1>PASSWORD</h1>
+        <input type="text" placeholder="OLD PASSWORD"><br><br>
+        <input type="text" placeholder="NEW PASSWORD"><br><br>
+        <input type="text" placeholder="REPEAT PASSOWRD"><br><br>
+        <button>Update</button>
+    </div>
+
+    <div class="add-blog">
+        <h1>ADD YOUR <span>DAILY BLOGS</span> HERE</h1>
+
+        <div class="blog-post">
+            <input type="text" id="title" placeholder="TITLE"><br><br>
+            <textarea name="" id="text" cols="30" rows="10" placeholder="WHAT'S IN YOUR MIND??" ></textarea><br>
+            <button id="add-blog">ADD BLOG</button>
+        </div>
+    
+        <div class="my-blog">
+            <h1>MY BLOGS</h1>
+            <div class="blogs"></div>
+        </div>
+    </div>
+</main>
+
+
+    <script type="module" src="./profile.js"></script>
+    <script type="module" src="./config.js"></script>
+</body>
+</html>

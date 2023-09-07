@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+header {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background-color: slateblue;
+    color: #fff;
+}
+header .div {
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+header .text {
+    display: flex;
+    justify-content: space-between;
+}
+header .text h1 {
+    margin: 0 10px;
+}
+header .text h2 {
+    color: whitesmoke;
+}
+header li {
+    list-style-type: none;
+}
+header a {
+    text-decoration: none;
+    color: slateblue;
+    font-weight: 800;
+}
+.listItem  {
+    position: absolute;
+    background-color: whitesmoke;
+    padding: 15px;
+    z-index: 1;
+    display: none;
+}
+.listItem.active {
+    display: block;
+}
+.text h1 {
+    text-align: center;
+    margin: 15px;
+}
+.blogDiv {
+    border: 2px solid slateblue;
+    margin: 15px;
+    padding: 15px;
+    line-height: 35px;
+}
+.blogDiv h1 {
+    text-transform: uppercase;
+    margin: 7px;
+    color: slateblue;
+    text-decoration: underline;
+}
