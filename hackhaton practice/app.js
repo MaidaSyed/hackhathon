@@ -5,13 +5,14 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.
 const db = getDatabase();
 const auth = getAuth();
 let name = document.querySelector(".name")
+let userId;
 
 auth.onAuthStateChanged(user => {
     if (user) {
         // if (location.pathname !== '/profile.html') {
         // 	location.href = 'profile.html', "index.html";
         // }
-        const userId = auth.currentUser.uid;
+        userId = auth.currentUser.uid;
         const databaseRef = ref(db, "users/" + userId);
 
         onValue(databaseRef, (snapshot) => {
@@ -29,7 +30,7 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-const loginBtn = document.getElementById('logout');
+const loginBtn = document.getElementById('login');
 loginBtn.addEventListener('click', () => {
     window.location.href = "./login.html"
 });
@@ -57,18 +58,15 @@ let userArray = []
 let userBlogArr = []
 let userDate = []
 let userName = []
-let userUid = []
 let userBlogText;
 let userBlogTitle;
 let userBlogDate;
 let blogUserName;
-let userUidLink;
 snapshot.forEach((user) => {
     userBlogTitle = user.val().title
     userBlogText = user.val().text
     userBlogDate = user.val().date
     blogUserName = user.val().name
-    userUidLink = user.val().userId
     // console.log(userData);
     // let userKey = user.key
     // console.log(userKey);
@@ -77,13 +75,11 @@ snapshot.forEach((user) => {
     userBlogArr.push(userBlogText)
     userName.push(blogUserName)
     userDate.push(userBlogDate)
-    userUid.push(userUidLink)
 })
 userArray.reverse();
 userBlogArr.reverse();
 userName.reverse();
 userDate.reverse();
-userUid.reverse();
 
 const blogContainer = document.querySelector(".my-blog");
 const addBlog = (title, blog, name, date, link) => {
@@ -96,12 +92,30 @@ const addBlog = (title, blog, name, date, link) => {
     blogDiv2.className = "blog"
     blogDiv2.innerHTML = `<strong id="st">${title}:</strong> <br> 
                           <p>${blog}</p> <br>
-                          <a href="${link}"> know all fron this user <a>`
+                          <a href=""> know all fron this user <a>`
 
     blogDiv.appendChild(blogDiv1)
     blogDiv.appendChild(blogDiv2)
     blogContainer.appendChild(blogDiv)
 }
 for (let i = 0; i < userArray.length; i++) {
-    addBlog(userArray[i], userBlogArr[i], userName[i], userDate[i], userUid[i]);
+    addBlog(userArray[i], userBlogArr[i], userName[i], userDate[i]);
 }
+
+// SHOW PROFILE PHOTO
+function showImg() {
+    const userUid = auth.currentUser.uid
+    const roundProfile = document.getElementById("round-prof")
+    const databaseRef = ref(db, "users/" + userUid);
+  
+    onValue(databaseRef, (snapshot) => {
+      const url = snapshot.val().imageUrl
+      roundProfile.src = url
+      console.log(url);
+    })
+
+    roundProfile.addEventListener("click", () => {
+        window.location.href = "./profile.html"
+    })
+  }
+showImg()

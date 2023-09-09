@@ -1,10 +1,25 @@
 import { getDatabase, ref, push, get, onValue, update, remove, } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"
+import { getAuth, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"
 
 import { db } from "./config.js";
 const auth = getAuth();
 const database = getDatabase()
+const storage = getStorage()
 let userUid;
+
+const loader = document.querySelector(".lds-spinner");
+const body = document.querySelector(".spinner-overlay");
+
+function showLoader() {
+    loader.style.display = "flex"
+    body.style.display = "flex"
+}
+function hideLoader() {
+    loader.style.display = "none"
+    body.style.display = "none"
+}
+hideLoader()
 
 auth.onAuthStateChanged(user => {
   if (user) {
@@ -26,7 +41,6 @@ auth.onAuthStateChanged(user => {
     console.log('User is signed out.');
   }
 });
-
 // NAME EDIT FROM PROFILE
 const editName = () => {
   const userId = auth.currentUser.uid
@@ -41,8 +55,10 @@ const editName = () => {
       name: nameInp.value
     });
   }
+
   editBtn.addEventListener("click", () => {
     editNameinFirebase()
+    nameInp.innerHTML = ""
     editBox.classList.remove("active")
     const overlay = document.querySelector(".overlay")
     overlay.style.display = "none"
@@ -54,59 +70,90 @@ edit.addEventListener("click", () => {
   const overlay = document.querySelector(".overlay")
   overlay.style.display = "block"
 })
-// ======================
-
-
-const btnPass = document.getElementById("updatePass");
-
-const updatePass = () => {
-  const userAuth = auth.currentUser;
-  const oldPassInput = document.getElementById('old-pass').value; // Replace with the actual ID of your old password input element
-  const newPassInput = document.getElementById('new-pass').value; // Replace with the actual ID of your new password input element
-
-  // Create a credential with the user's email and password
-  const credential = firebase.auth.EmailAuthProvider.credential(
-    userAuth.email, // Assuming you're using email/password authentication
-    oldPassInput
-  );
-
-  // Reauthenticate the user
-  userAuth.reauthenticateWithCredential(credential)
-    .then(() => {
-      // Password successfully reauthenticated
-      // Now update the password
-      userAuth.updatePassword(newPassInput)
-        .then(() => {
-          console.log("Password updated successfully");
-          // Clear input fields
-          document.getElementById('old-pass').value = "";
-          document.getElementById('new-pass').value = "";
-        })
-        .catch((error) => {
-          console.error("Error updating password:", error);
-        });
-    })
-    .catch((error) => {
-      console.error("Reauthentication failed:", error);
-    });
-};
-
-
-
-btnPass.addEventListener("click", updatePass)
-
-
+// CANCEL BOX
 const cancel = document.querySelectorAll(".cancel-name");
 cancel.forEach(btn => {
   btn.addEventListener("click", () => {
+    const nameInp = document.getElementById("editedName");
     let delBox = document.querySelector(".editName");
     const overlay = document.querySelector(".overlay")
     overlay.style.display = "none"
-
     delBox.classList.remove("active")
+    nameInp.value = ""
   })
 })
 
+// ======================
+
+// PASSWORD UPDATE WORKING
+const btnPass = document.getElementById("updatePass");
+
+const updatePass = () => {
+  const user = auth.currentUser;
+  const userUid = auth.currentUser.uid;
+  console.log(userUid);
+  const oldPassInput = document.getElementById('old-pass').value;
+  const newPassInput = document.getElementById('new-pass').value;
+  const repPassInput = document.getElementById('rep-pass').value;
+
+  const databaseRef = ref(database, "users/" + userUid);
+
+  let password;
+  // Example: Fetch data from the Firebase Realtime Database
+  onValue(databaseRef, (snapshot) => {
+    password = snapshot.val().password
+  })
+  // Reauthenticate the user using their current password
+  const credential = EmailAuthProvider.credential(user.email, oldPassInput);
+
+  reauthenticateWithCredential(user, credential)
+    .then(() => {
+      // Reauthentication successful, now update the password
+      if (newPassInput === repPassInput && oldPassInput === password) {
+        updatePassword(user, newPassInput)
+          .then(() => {
+            update(databaseRef, {
+              password: newPassInput
+            })
+            Swal.fire({
+              position: 'center',
+              icon: 'success',
+              title: 'Password Update',
+              showConfirmButton: true,
+              timer: 1500,
+            });
+            // Clear input fields
+            document.getElementById('old-pass').value = '';
+            document.getElementById('new-pass').value = '';
+            document.getElementById('rep-pass').value = '';
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: "Something Went Wrong",
+            });
+          });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: "Repeat passsword should same as new Password",
+        });
+      }
+    })
+    .catch((error) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: "Olg Password Is in Correct",
+      });
+    });
+};
+btnPass.addEventListener("click", updatePass);
+// =============================================
+
+// SIGNOUT USER WORKING
 const signoutUser = () => {
   signOut(auth)
     .then(() => {
@@ -116,15 +163,19 @@ const signoutUser = () => {
     .catch((error) => {
       // An error happened.
     });
+    showLoader()
   window.location.href = "./index.html"
 };
 const logout = document.getElementById("logout")
 logout.addEventListener("click", signoutUser)
+// ===================
 
+// ADDBLOGS IN FIREBASE
 const title = document.getElementById("title");
 const text = document.getElementById("text");
 const addBtn = document.getElementById("add-blog");
 
+// SEND DATE
 const months = [
   "Jan", "Feb", "March", "April", "May", "June",
   "July", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -134,12 +185,15 @@ const day = date.getDate();
 const year = date.getFullYear();
 const monthIndex = date.getMonth();
 const monthName = months[monthIndex];
-
 let blogDate = `${day}-${monthName}-${year}`
+
+// SEND TIME 
 const sendBlogs = () => {
   const blogTitle = title.value;
   const blogText = text.value;
   let uniqueId = auth.currentUser.uid
+
+ 
 
   const databaseRef = ref(database, "users/" + uniqueId);
   let userName;
@@ -148,9 +202,8 @@ const sendBlogs = () => {
     console.log(snapshot.val());
     userName = snapshot.val().name
   })
-
-  if (blogTitle && blogText) {
-    const blogRef = ref(db, "blogs/", uniqueId)
+  if (blogText.length >= 50 && blogTitle && blogText) {
+    const blogRef = ref(db, "blogs/", uniqueId);
     push(blogRef, {
       title: blogTitle,
       text: blogText,
@@ -158,119 +211,188 @@ const sendBlogs = () => {
       date: blogDate,
       userId: uniqueId,
       name: userName,
-    })
-    title.value = ""
-    text.value = ""
-  }
-
+    });
+    title.value = "";
+    text.value = "";
+      showLoader()
   window.location.reload()
+  } else {
+    Swal.fire('Blog should be 50 characters long');
+  }
 }
 addBtn.addEventListener("click", sendBlogs);
+// ======================================
 
+// ADD BLOG IN PROFILE PAGE
 const dbRef = ref(db, "blogs/");
 const snapshot = await get(dbRef);
-let userKey;
 const blogContainer = document.querySelector(".blogs");
 blogContainer.innerHTML = ""; // Clear the container to remove previously displayed blogs
+// Create an array to store blog objects
+let userArray = []
+let userBlogArr = []
+let userDate = []
+let userName = []
+let blogKey = []
+let userBlogText;
+let userBlogTitle;
+let userBlogDate;
+let blogUserName;
+let blogKeyGet;
 snapshot.forEach((user) => {
+  showLoader()
   const blogUid = user.val().userId; // Get the UID associated with each blog
-  userKey = user.key
-  // console.log(userKey);
 
   // Check if the blog belongs to the currently logged-in user
   if (blogUid === userUid) {
-    const userBlogTitle = user.val().title;
-    const userBlogText = user.val().text;
-    const userBlogDate = user.val().date;
-    const blogUserName = user.val().name;
+    userBlogTitle = user.val().title
+    userBlogText = user.val().text
+    userBlogDate = user.val().date
+    blogUserName = user.val().name
+    blogKeyGet = user.key
 
-    const addBlog = (title, blog, name, date) => {
-      const blogDiv = document.createElement("div")
-      blogDiv.className = "blogDiv"
-      const blogDiv1 = document.createElement("div")
-      blogDiv1.className = "userName"
-      blogDiv1.innerHTML = `<h1>${name} <span> || ${date}</span></h1>`
-      const blogDiv2 = document.createElement("div")
-      blogDiv2.className = "blog"
-      blogDiv2.innerHTML = `<strong id="st">${title}:</strong> <br> 
-                            <p>${blog}</p> <br>
-                            <button class="edit">EDIT</button> 
-                            <button class="delete">DELETE</button> `
-      blogDiv.appendChild(blogDiv1)
-      blogDiv.appendChild(blogDiv2)
-      blogContainer.appendChild(blogDiv)
-    };
-    addBlog(userBlogTitle, userBlogText, blogUserName, userBlogDate);
-
-
-
+    // Push the blog object into the array
+    userArray.push(userBlogTitle);
+    userBlogArr.push(userBlogText);
+    userName.push(blogUserName);
+    userDate.push(userBlogDate);
+    blogKey.push(blogKeyGet);
   }
-
-
-
 });
+// BLOG ADDED FUNCTION
+userArray.reverse();
+userBlogArr.reverse();
+userName.reverse();
+userDate.reverse();
+blogKey.reverse();
 
-let editBtn = document.querySelectorAll(".edit");
-let delBtn = document.querySelectorAll(".delete");
-const UpdateBLogs = () => {
-  let blogBox = document.querySelector(".updateBlogs");
-  let blogBoxTitle = document.getElementById("updateTitle");
-  let blogBoxBLog = document.getElementById("updateBlog");
-  const editBlogBtn = document.getElementById("edit-btn");
-  blogBox.classList.add("active");
+const addBlog = (title, blog, name, date, key) => {
+  const blogDiv = document.createElement("div")
+  blogDiv.className = "blogDiv"
+  const blogDiv1 = document.createElement("div")
+  blogDiv1.className = "userName"
+  blogDiv1.innerHTML = `<h1>${name} <br><span> || ${date}</span></h1> `
+  const blogDiv2 = document.createElement("div")
+  blogDiv2.className = "blog"
+  blogDiv2.innerHTML = `<strong>${title}:</strong> <br> 
+                          <p>${blog}</p> <br>
+                          <button class="edit" data-blog-key="${blog.key}">EDIT</button> 
+                          <button class="delete">DELETE</button> <br>
+                          <button class="blogKey">${key}</button>`
 
+  blogDiv.appendChild(blogDiv1)
+  blogDiv.appendChild(blogDiv2)
+  blogContainer.appendChild(blogDiv)
+}
+for (let i = 0; i < userArray.length; i++) {
+  addBlog(userArray[i], userBlogArr[i], userName[i], userDate[i], blogKey[i]);
+}
+hideLoader()
+// =====================================================
 
-  const updateBlogInFirebase = () => {
-    // Get the current blog's unique ID (replace this with your logic)
-    const uniqueId = userKey;
-    console.log(uniqueId);
+// EDIT BLOG WORKING
+snapshot.forEach((user) => {
+  // // EDIT BLOG OPTIONS 
+  const blogUid = user.val().userId; // Get the UID associated with each blog
 
-    // Create a reference to the blog you want to update
-    const blogRef = ref(database, "blogs/" + userKey);
+  // Check if the blog belongs to the currently logged-in user
+  if (blogUid === userUid) {
+    let editBtn = document.querySelectorAll(".edit");
+    // console.log(editBtn);
 
-    // Update the blog's title and text
-    update(blogRef, {
-      title: blogBoxTitle.value,
-      text: blogBoxBLog.value,
+    const editBLogs = (key) => {
+      let blogBox = document.querySelector(".updateBlogs");
+      blogBox.classList.add("active");
+      const overlay = document.querySelector(".overlay");
+      overlay.style.display = "flex";
+      const editBlogBtn = document.getElementById("edit-btn")
+      const title = document.getElementById("updateTitle");
+      const text = document.getElementById("updateBlog");
+
+      const blogRef = ref(database, "blogs/" + key)
+
+      let titleValue;
+      let textValue;
+      onValue(blogRef, (snapshot) => {
+        titleValue = snapshot.val().title;
+        textValue = snapshot.val().text;
+        title.value = titleValue;
+        text.textContent = textValue;
+        console.log(titleValue);
+        console.log(textValue);
+      })
+
+      const updateBlogsInFirebase = () => {
+
+        const blogRef = ref(database, "blogs/" + key)
+
+        update(blogRef, {
+          title: title.value,
+          text: text.value,
+        })
+        title.innerHTML = ""
+        text.innerHTML = ""
+        blogBox.classList.remove("active");
+        showLoader()
+        window.location.reload()
+      }
+      editBlogBtn.addEventListener("click", updateBlogsInFirebase)
+    }
+
+    editBtn.forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Find the closest .blogDiv parent element to the clicked button
+        const blogDiv = btn.closest(".blogDiv");
+
+        // Get the blog key from the .blogKey element within the found .blogDiv
+        const blogKey = blogDiv.querySelector(".blogKey").innerHTML;
+
+        console.log(blogKey);
+        editBLogs(blogKey)
+        // Further processing or editing can be done here
+
+        const overlay = document.querySelector(".overlay");
+        overlay.style.display = "flex";
+      });
     });
-
-    // Clear the input fields
-    document.getElementById("updateTitle").value = "";
-    document.getElementById("updateBlog").value = "";
-
-    // Close the update box or perform any other desired actions
-    blogBox.classList.remove("active");
-    window.location.reload()
-  };
-
-  editBlogBtn.addEventListener("click", updateBlogInFirebase);
-};
-// Replace "editBtn" with the actual element ID you're using to trigger this function.
-editBtn.forEach(btn => {
-  btn.addEventListener("click", () => {
-    UpdateBLogs()
-    const overlay = document.querySelector(".overlay")
-    overlay.style.display = "flex"
-  });
+  }
+  // ==========================================
 })
+// CANCEL BUTTON
+const cancelEdit = document.querySelectorAll(".cancel-blog");
+cancelEdit.forEach(btn => {
+  btn.addEventListener("click", () => {
+    let blogBox = document.querySelector(".updateBlogs");
+    const overlay = document.querySelector(".overlay")
+    const title = document.getElementById("updateTitle")
+    const text = document.getElementById("updateBlog")
+    title.value = ""
+    text.value = ""
+    overlay.style.display = "none"
+    blogBox.classList.remove("active")
+  })
+})
+// ================================
 
-const deleteBlogs = () => {
+
+// DELETE BLOGS WORKING
+let delBtn = document.querySelectorAll(".delete");
+
+const deleteBlogs = (blogKey) => {
   let delBox = document.querySelector(".deleteBlogs");
   const delBlogBtn = document.getElementById("del-btn");
-
   delBox.classList.add("active")
 
   const delBlogs = () => {
-    const uniqueId = userKey;
-
     // Create a reference to the blog you want to update
-    const blogRef = ref(database, "blogs/" + uniqueId);
+    const blogRef = ref(database, "blogs/" + blogKey);
 
     // Update the blog's title and text
     remove(blogRef)
       .then(function () {
         console.log("Data deleted successfully!");
         delBox.classList.remove("active")
+        showLoader()
         window.location.reload()
       })
       .catch(function (error) {
@@ -279,37 +401,139 @@ const deleteBlogs = () => {
 
   }
   delBlogBtn.addEventListener("click", delBlogs)
-  delBox.classList.remove("active");
-  window.location.reload()
+  // delBox.classList.remove("active");
 }
 delBtn.forEach(btn => {
   btn.addEventListener("click", () => {
-    deleteBlogs()
-    const overlay = document.querySelector(".overlay")
-    overlay.style.display = "flex"
-  })
-})
+    // Find the closest .blogDiv parent element to the clicked button
+    const blogDiv = btn.closest(".blogDiv");
 
+    // Get the blog key from the .blogKey element within the found .blogDiv
+    const blogKey = blogDiv.querySelector(".blogKey").innerHTML;
 
+    deleteBlogs(blogKey)
+    // Further processing or editing can be done here
 
-const cancelEdit = document.querySelectorAll(".cancel-blog");
-const cancelDel = document.querySelectorAll(".Del-del");
+    const overlay = document.querySelector(".overlay");
+    overlay.style.display = "flex";
+  });
+});
 
-cancelEdit.forEach(btn => {
-  btn.addEventListener("click", () => {
-    let blogBox = document.querySelector(".updateBlogs");
-    const overlay = document.querySelector(".overlay")
-    overlay.style.display = "none"
+// ===========================
+const cancelDel = document.querySelectorAll(".cancel-del");
 
-    blogBox.classList.remove("active")
-  })
-})
 cancelDel.forEach(btn => {
   btn.addEventListener("click", () => {
     let delBox = document.querySelector(".deleteBlogs");
     const overlay = document.querySelector(".overlay")
     overlay.style.display = "none"
-
     delBox.classList.remove("active")
   })
 })
+// ============================
+
+// PROFLE IMAGE WORKING
+const editProfile = () => {
+  const userId = auth.currentUser.uid;
+  const uploadBox = document.querySelector(".editProfile");
+  uploadBox.classList.add("active");
+
+  const uploadBtn = document.getElementById('editProfile-btn');
+  const fileInput = document.getElementById('editedProfile');
+
+  uploadBtn.addEventListener('click', () => {
+    const file = fileInput.files[0];
+
+    if (file) {
+      const timestamp = Date.now();
+      const filename = `${timestamp}_${file.name}`;
+
+      const profileRef = storageRef(storage, 'Profile-images/' + filename);
+
+      uploadBytes(profileRef, file)
+        .then((snapshot) => {
+          console.log('File uploaded successfully.');
+          getDownloadURL(snapshot.ref)
+            .then((downloadURL) => {
+              const imageUrl = downloadURL;
+
+              const userRef = ref(database, 'users/' + userId);
+
+              update(userRef, {
+                imageUrl: imageUrl,
+              })
+                .then(() => {
+                  console.log('User data updated with image URL.');
+                  uploadBox.classList.remove("active");
+                  const overlay = document.querySelector(".overlay");
+                  overlay.style.display = "none";
+                })
+                .catch((error) => {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: "Something went wrong",
+                  });
+                });
+            })
+            .catch((error) => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: "Something went wrong",
+              })
+            });
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: "Something went wrong",
+          })
+        });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: "PLEASE SELECT PROFILE IMAGE",
+      });
+    }
+  });
+};
+
+const upload = document.querySelector(".fa-upload");
+upload.addEventListener("click", () => {
+  editProfile();
+  const overlay = document.querySelector(".overlay");
+  overlay.style.display = "block";
+});
+//===================================
+// CANCEL BOX
+const cancelProfile = document.querySelectorAll(".cancel-profile");
+cancelProfile.forEach(btn => {
+  btn.addEventListener("click", () => {
+    let delBox = document.querySelector(".editProfile");
+    const overlay = document.querySelector(".overlay")
+    overlay.style.display = "none"
+    delBox.classList.remove("active")
+  })
+})
+//=======================
+
+//  SHOW PROFILE IMG
+showLoader()
+function showImg() {
+  const userUid = auth.currentUser.uid
+  const profileImg = document.getElementById("profile-img")
+  const roundProfile = document.getElementById("round-prof")
+  const databaseRef = ref(database, "users/" + userUid);
+  onValue(databaseRef, (snapshot) => {
+    const url = snapshot.val().imageUrl
+    profileImg.src = url
+    roundProfile.src = url
+    console.log(url);
+  })
+}
+showImg()
+hideLoader()
+// ===========================

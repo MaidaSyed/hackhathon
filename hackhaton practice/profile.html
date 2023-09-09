@@ -13,6 +13,7 @@
 <body>
     <header>
         <div class="text">
+            <img id="round-prof" src="" alt="">
             <h1 class="name"></h1>
             <h2 id="login">Login</h2>
         </div>
@@ -24,7 +25,8 @@
     <main>
     <div class="userData">
         <div class="img">
-            <img src="" alt="">
+            <i class="fa-solid fa-upload"></i>
+            <img id="profile-img" src="" alt="">
         </div>
         <h1 id="name"></h1>
         <span><i class='fa-solid fa-pen-to-square'></i></span>
@@ -77,8 +79,32 @@
 </div>
 <!-- </div> -->
 
+<div class="editProfile">
+    <input type="file" id="editedProfile">
+    <button id="editProfile-btn">Upload</button>
+    <button class="cancel-profile">CANCEL</button>
+</div>
+
+<div class="spinner-overlay">
+    <div class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+</div>
+
 
     <script type="module" src="./profile.js"></script>
     <script type="module" src="./config.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
