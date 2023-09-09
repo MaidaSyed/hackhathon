@@ -8,15 +8,21 @@ body {
 
 header {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     padding: 15px;
-    background-color: slateblue;
+    background-color: #551a8b;
     color: #fff;
+    height: 40px;
 }
 header .div {
+    margin-top: 7px;
+    margin-right: 15px;
     color: white;
-    font-size: 30px;
+    font-size: 20px;
+    width: 400px;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
 }
 header .text {
     display: flex;
@@ -24,27 +30,14 @@ header .text {
 }
 header .text h1 {
     margin: 0 10px;
+    font-family: "Sofia", sans-serif;
 }
 header .text h2 {
     color: whitesmoke;
 }
-header li {
-    list-style-type: none;
-}
-header a {
+header .div a {
     text-decoration: none;
-    color: slateblue;
-    font-weight: 800;
-}
-.listItem  {
-    position: absolute;
-    background-color: whitesmoke;
-    padding: 15px;
-    z-index: 1;
-    display: none;
-}
-.listItem.active {
-    display: block;
+    color: #fff;
 }
 
 main {
@@ -54,14 +47,19 @@ main {
 
 .userData {
     padding: 25px;
-    width: 45%;
-    border-radius: 20px;
+    width: 30%;
+    /* border-radius: 20px; */
     box-shadow: 0 0 5px rgba(0, 0, 0, 1);
-    margin: 15px;
+    /* margin: 15px; */
+    overflow: hidden;
+    overflow-y: scroll;
+    border-right: 5px solid #551a8b;
+    height: 81.5vh;
+    background-color: whitesmoke;
 }
 
 .userData .img {
-    border: 2px solid slateblue;
+    border: 2px solid #551a8b;
     width: 150px;
     height: 150px;
     border-radius: 5px;
@@ -84,98 +82,295 @@ main {
  #name {
     text-transform: uppercase;
     font-size: 40px;
+    font-family: "Audiowide", sans-serif;
+    margin: 0;
 }
-
+#name span {
+    font-size: 20px;
+}
+.fa-pen-to-square {
+    text-align: center;
+}
 .userData input {
     padding: 10px;
     outline: none;
-    border: 1px solid slateblue;
-    border-radius: 5px;
+    border: none;
+    border-bottom: 2px solid gainsboro;
+    background: transparent;
     font-size: 16px;
-    width: 96%;
+    width: 95%;
+    transition: 0.6s ease;
+}
+
+.userData input:focus {
+    border-bottom: 2px solid #551a8b;
 }
 
 .userData button {
-    border: 2px solid slateblue;
+    border: 2px solid #551a8b;
     font-size: 16px;
     padding: 10px;
     border-radius: 5px;
     width: 100%;
+    transition: 0.3s ease;
 }
 
 .add-blog {
-    width: 45%;
+    width: 65%;
     padding: 0 20px;
     overflow-y: scroll;
     overflow-wrap: break-word;
-    height: 85vh;
+    height: 88vh;
 }
 
 .add-blog h1 {
     margin: 20px;
     text-align: center;
+    font-family: "Audiowide",sans-serif;
 }
 
 span {
-    color: slateblue;
+    color: #551a8b;
 }
 
 .add-blog input {
-    border: 1px solid slateblue;
+    border: 2px solid #551a8b;
     border-radius: 5px;
     padding: 10px;
-    width: 95%;
+    width: 97%;
     outline: none;
+    font-size: 22px;
 }
 
 .add-blog textarea{
-    width: 95%;
+    width: 97%;
     height: 200px;
     resize: none;
     outline: none;
     font-size: 20px;
-    border: 2px solid slateblue;
+    border: 3px solid #551a8b;
     border-radius: 10px;
     padding: 8px;
 }
 
-.add-blog button {
+.add-blog #add-blog {
     width: 100%;
-    margin: 10px auto;
-    border: 2px solid slateblue;
+    margin-left: 0;
+}
+
+.add-blog button {
+    width: 45%;
+    margin: 10px 15px;
+    border: 2px solid #551a8b;
     border-radius: 20px;
     padding: 10px;
     font-size: 20px;
+    transition: 0.3s ease;
 }
 
 button:hover {
-    transform: scale(0.98);
-    background: transparent;
+    transform: scale(1.01);
+    background: #551a8b;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .blogDiv {
-    border: 2px solid slateblue;
-    margin: 15px;
-    padding: 15px;
-    line-height: 35px;
+    border: 2px solid #551a9b;
+    margin: 25px;
+    border-radius: 30px;
+    overflow: hidden;
 }
 .blogDiv h1 {
     text-transform: uppercase;
-    margin: 7px;
-    color: slateblue;
-    text-decoration: underline;
-    text-align: left;
+    background-color: #551a9b;
+    border-radius: 20px;
+    padding: 15px;
+    border: 20px;
+    color: #fff;
+    font-family: "Audiowide", sans-serif;
+}
+.blogDiv h1 span {
+    font-size: 15px;
+    color: whitesmoke;
+}
+.blogDiv #st {
+    font-size: 25px;
+    text-transform: capitalize;
+    font-family: "Sofia", sans-serif;
+}
+.blogDiv p {
+    margin-top: 20px;
+    margin-left: 40px;
+    font-style: italic;
+    font-weight: 300;
+    color: #1c1c1c;
+}
+.blog {
+padding: 20px;
 }
 
 @media screen and (max-width:750px) {
+    header {
+        width: 100%;
+    }
+    header .text {
+        display: none;
+    }
     main {
         display: block;
     }
     .userData {
-        width: 100%;
-        margin: 15px;
+        width: 99%;
+        margin: 0px;
+        border-right: 0;
+        overflow: visible;
+        padding: 15px;
+        height: fit-content;
     }
     .add-blog {
+        width: 96%;
+        margin: 0;
+        overflow: visible;
+    }
+    .add-blog button {
+        margin-left: 0;
+    }
+}
+@media screen and (max-width:500px) {
+    .add-blog input {
+        width: 93%;
+    }
+    .add-blog textarea {
+        width: 93%;
+    }
+}
+@media screen and (max-width:450px) {
+    .add-blog button {
+        /* margin-left: 0; */
         width: 100%;
     }
+    .add-blog input {
+        width: 93%;
+    }
+    .add-blog textarea {
+        width: 93%;
+    }
+}
+
+.updateBlogs,
+.deleteBlogs {
+    border: 2px solid #551a8b;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    width: fit-content;
+    border-radius: 20px;
+    background-color: #551a8b;
+    position: absolute;
+    top: 20%;
+    left: 33%;
+    z-index: 100;
+    transition: 0.5s ease;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+    display: none;
+}
+.updateBlogs.active {
+    display: block;
+}
+.deleteBlogs.active {
+    display: block;
+}
+.updateBlogs h2 {
+    margin: 10px;
+    text-align: center;
+    color: whitesmoke;
+}
+.updateBlogs input {
+    border: 1px solid whitesmoke;
+    outline: none;
+    border-radius: 5px;
+    padding: 10px;
+    width: 400px;
+    margin: 10px 0;
+}
+.updateBlogs textarea {
+    width: 400px;
+    outline: none;
+    resize: none;
+    border: 2px solid whitesmoke;
+    border-radius: 10px;
+    padding: 10px;
+}
+.updateBlogs button {
+    width: 100%;
+    margin: 10px auto;
+    border: 2px solid whitesmoke;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 20px;
+    transition: 0.3s ease;
+}
+.deleteBlogs {
+position: absolute;
+top: 45%;
+left: 37%;
+}
+.deleteBlogs button {
+    padding: 10px;
+    border: 2px solid whitesmoke;
+    border-radius: 20px;
+    margin: 20px 5px;
+    width: 46%;
+    transition: 0.3s ease;
+}
+.deleteBlogs p {
+    color: whitesmoke;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    /* z-index: 9999; */
+    display: none;
+}
+
+
+.editName {
+    position: absolute;
+    top: 45%;
+    left: 35%;
+    display: flex;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 1);
+    z-index: 100;
+    background-color: #551a8b;
+    padding: 20px;
+    width: fit-content;
+    border-radius: 20px;
+    transition: 0.5s ease;
+    display: none;
+}
+.editName.active {
+    display: block;
+}
+.editName input {
+    padding: 10px;
+    border-radius: 10px;
+    outline: none;
+    border: none;
+}
+.editName button {
+    padding: 10px;
+    border-radius: 10px;
+    outline: none;
+    border: 2px solid whitesmoke;
+    margin-left: 10px;
 }

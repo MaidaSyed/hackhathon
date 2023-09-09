@@ -9,13 +9,11 @@ header {
     display: flex;
     justify-content: space-around;
     padding: 15px;
-    background-color: slateblue;
+    background-color: #551a9b;
     color: #fff;
 }
-header .div {
-    color: white;
-    font-size: 30px;
-    cursor: pointer;
+header .font-effect-outline {
+    font-family: "Sofia", sans-serif;
 }
 header .text {
     display: flex;
@@ -23,41 +21,99 @@ header .text {
 }
 header .text h1 {
     margin: 0 10px;
+    cursor: pointer;
+    font-family: "Sofia", sans-serif;
+    text-shadow: 3px 3px 3px #ababab;
 }
 header .text h2 {
     color: whitesmoke;
-}
-header li {
-    list-style-type: none;
-}
-header a {
-    text-decoration: none;
-    color: slateblue;
-    font-weight: 800;
-}
-.listItem  {
-    position: absolute;
-    background-color: whitesmoke;
-    padding: 15px;
-    z-index: 1;
-    display: none;
-}
-.listItem.active {
-    display: block;
+    cursor: pointer;
+    margin: 10px;
+    font-family: "Audiowide", sans-serif;
 }
 .text h1 {
     text-align: center;
     margin: 15px;
+    font-family: "Audiowide", sans-serif;
+}
+.text .greet {
+    text-align: left;
+    font-family: "Sofia", sans-serif;
+    text-shadow: 3px 3px 3px #ababab;
+}
+.text .greet .fa-sun, .fa-mountain-sun {
+    background: linear-gradient(orange, orangered);
+    padding: 5px;
+    color: yellow;
+}
+.text .greet .fa-bed {
+    color: blue;
+}
+.text .greet .fa-moon {
+    background: linear-gradient(#1f1f1f, darkblue);
+    color: #fff;
+    padding: 5px;
 }
 .blogDiv {
-    border: 2px solid slateblue;
-    margin: 15px;
-    padding: 15px;
-    line-height: 35px;
+    border: 2px solid #551a9b;
+    margin: 25px;
+    border-radius: 30px;
+    overflow: hidden;
 }
 .blogDiv h1 {
+    margin: 10px;
+    border-radius: 20px;
     text-transform: uppercase;
-    margin: 7px;
-    color: slateblue;
-    text-decoration: underline;
+    background-color: #551a9b;
+    padding: 15px;
+    border: 20px;
+    color: #fff;
+    font-family: "Audiowide", sans-serif;
+}
+.blogDiv h1 span {
+    font-size: 15px;
+    color: whitesmoke;
+}
+.blogDiv #st {
+    font-size: 25px;
+    text-transform: capitalize;
+    font-family: "Sofia", sans-serif;
+}
+.blogDiv p {
+    margin-top: 20px;
+    margin-left: 40px;
+    font-style: italic;
+    font-weight: 300;
+    color: #1c1c1c;
+}
+.blog {
+padding: 20px;
+}
+.blog a {
+    color: #551a9b;
+}
+.blog a:hover {
+    text-decoration: none;
+}
+
+@media screen and (max-width:900px) {
+    .font-effect-outline {
+        display: none;
+    }
+}
+@media screen and (max-width:430px) {
+    .blogDiv h1 {
+        line-break:strict;
+    }
+}
+@media screen and (max-width:350px) {
+    .text .name {
+        font-size: 25px;
+    }
+    .text #logout {
+        font-size: 15px;
+    }
+    .greet {
+        font-size: 25px;
+    }
 }

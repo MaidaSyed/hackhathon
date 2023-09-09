@@ -1,22 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="sweetalert2.min.js"></script>
+<link rel="stylesheet" href="sweetalert2.min.css"> -->
     <link rel="stylesheet" href="./loginAndSign.css">
     <title>Document</title>
 </head>
+
 <body>
     <div class="form">
         <h1>SIGNUP</h1>
-    <input type="text" required name="" id="name" placeholder="ENTER NAME"><br><br>
-    <input type="email" required name="" id="email" placeholder="ENTER EMAIL"><br><br>
-    <input type="text" pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!])[A-Za-z\d@#$%^&+=!]{8,}$" required name="" id="password" placeholder="ENTER PASSWORD"><br><br>
-    <p>already have an account? <a href="./login.html">Login</a></p><br>
-    <button id="signup-btn">SIGNUP</button>
+        <input type="text" required="" name="" id="name" placeholder="ENTER NAME"><br><br>
+        <input type="email" required="" name="" id="email" placeholder="ENTER EMAIL"><br><br>
+        <input type="text" pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!])[A-Za-z\d@#$%^&+=!]{8,}$" required=""
+            name="" id="password" placeholder="ENTER PASSWORD"><br><br>
+        <p>already have an account? <a href="./login.html">Login</a></p><br>
+        <button id="signup-btn">SIGNUP</button>
+    </div>
+
+    <div class="spinner-overlay">
+    <div class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
 </div>
 
     <script type="module" src="./config.js"></script>
     <script type="module" src="./signup.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
+
 </html>
